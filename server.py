@@ -1,10 +1,7 @@
-import json
 import urllib
 import requests
-
-from pprint import pprint
-from os.path import expanduser
 import PIL.Image as image
+
 
 class Image(object):
     def __init__(self, path):
@@ -38,7 +35,7 @@ class Image(object):
 
 class Match(object):
     def __init__(self, face_id, rectangle, image):
-        self.face_id = face_id
+        self.face_id = str(face_id)
         self.rectangle = rectangle
         self.image = image
 
@@ -49,21 +46,32 @@ class Match(object):
         return (self._match_size() / self.image.size) < (other._match_size() / self.image.size)
 
 
-class Face(object):
-    def __init__(self, face_id, rectangle, image_path):
-        self.matches = [Match(face_id, rectangle, image_path)]
+def group_matches(matches):
+    headers = {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': '4b768946680148ff9935e53f375f36ce',
+    }
 
-    def __eq__(self, other):
-        if not isinstance(other, Face):
-            return False
-        # Verify for all the matches
+    ids = [match.face_id for match in matches]
+    data = {"faceIds": ids}
 
-    def __iadd__(self, other):
-        self.matches += other.matches
+    url = 'https://westcentralus.api.cognitive.microsoft.com/face/v1.0/group'
+    response = requests.post(url, data=str(data), headers=headers)
+
+    most_common_face = filter(lambda match: match.face_id in response.json()['groups'][0], matches)
+    best_face = sorted(most_common_face)[0]
+
+    return {'rectangle': best_face.rectangle, 'path': best_face.image.path}
 
 
-def main():
-    pass
+def parse_images(images_paths):
+    detected_faces = []
+    for image_path in images_paths:
+        detected_faces += Image(image_path).detect_faces()
+
+    return group_matches(detected_faces)
+
+
 
 if __name__ == "__main__":
-    main()
+    pass
