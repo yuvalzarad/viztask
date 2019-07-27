@@ -1,12 +1,13 @@
 from app.views import parse_images
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
 
-@app.route('/group')
+@app.route('/group', methods=['POST'])
 def group_route():
-    return parse_images([r'C:/temp/images/img (1).jpg', 'C:/temp/images/img (2).jpg'])
+    content = request.get_json()
+    return parse_images(content['images'])
 
 
 if __name__ == "__main__":
