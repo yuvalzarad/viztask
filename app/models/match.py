@@ -8,4 +8,4 @@ class Match(object):
         return self.rectangle['width'] * self.rectangle['height']
 
     def __lt__(self, other):
-        return (self._match_size() / self.image.size) < (other._match_size() / self.image.size)
+        return (float(self._match_size()) / self.image.size) < (float(other._match_size()) / self.image.size)
