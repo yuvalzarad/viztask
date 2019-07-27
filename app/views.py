@@ -4,6 +4,11 @@ from models.image import Image
 MAX_FACES = 1000
 MIN_IMAGES_AMOUNT = 2
 
+
+class ServerException(Exception):
+    pass
+
+
 def group_matches(matches):
     headers = {
         'Content-Type': 'application/json',
@@ -18,7 +23,7 @@ def group_matches(matches):
 
     groups = response.json()['groups']
     if not groups:
-        raise Exception("Not a single face match.")
+        raise ServerException("Not a single face match.")
 
     most_common_face = filter(lambda match: match.face_id in groups[0], matches)
     best_face = sorted(most_common_face)[0]
@@ -28,13 +33,13 @@ def group_matches(matches):
 
 def parse_images(images_paths):
     if len(images_paths) < MIN_IMAGES_AMOUNT:
-        raise Exception("Must specify at least 2 images.")
+        raise ServerException("Must specify at least 2 images.")
 
     detected_faces = []
     for image_path in images_paths:
         detected_faces += Image(image_path).detect_faces()
 
     if len(detected_faces) > MAX_FACES:
-        raise Exception("Can't process more than 1000 faces, current: {}".format(len(detected_faces)))
+        raise ServerException("Can't process more than 1000 faces, current: {}".format(len(detected_faces)))
 
     return group_matches(detected_faces)
