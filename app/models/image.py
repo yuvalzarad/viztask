@@ -1,7 +1,7 @@
 import urllib
 import requests
 from PIL import Image as image
-from azure_face_api.match import Match
+from app.models.match import Match
 
 
 class Image(object):
