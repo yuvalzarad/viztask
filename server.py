@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/group')
 def group_route():
-    return parse_images([r'C:/temp/images/family.jpg', 'C:/temp/images/family_girls.jpg'])
+    return parse_images([r'C:/temp/images/img (1).jpg', 'C:/temp/images/img (2).jpg'])
 
 
 if __name__ == "__main__":
